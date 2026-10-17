@@ -1,0 +1,13 @@
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+sqlalchemy[asyncio]==2.0.35
+aiosqlite==0.20.0
+alembic==1.13.3
+pydantic-settings==2.5.2
+websockets==13.1
+python-multipart==0.0.12
+livekit-api==0.7.1
+eval-type-backport==0.4.0
+httpx==0.28.1
+pytest==8.3.3
+pytest-asyncio==0.24.0

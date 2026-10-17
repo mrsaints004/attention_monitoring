@@ -1,0 +1,74 @@
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+.aws/
+
+# Research documents and local datasets
+/Adedayo_Adegboyega_Faith.docx
+*.doc
+*.docx
+*.pdf
+/data/
+/datasets/
+
+# Dependencies and virtual environments
+node_modules/
+venv/
+.venv/
+env/
+.pnp.*
+
+# Build output and generated files
+.next/
+out/
+dist/
+build/
+coverage/
+.vercel/
+*.tsbuildinfo
+next-env.d.ts
+
+# Python caches and test output
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.coverage
+.coverage.*
+htmlcov/
+
+# Local databases, backups and logs
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+*.sqlite-*
+.backups/
+*.bak
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Editor and operating system files
+.DS_Store
+._*
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Local notes and workspace metadata
+*.md
+.*/
+!.github/
