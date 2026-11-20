@@ -21,3 +21,4 @@ def test_migration_preserves_legacy_readings(tmp_path):
         assert dict(db.execute('SELECT reading_id, attention_index FROM attentiveness_readings')) == {'valid': 80, 'missing': None}
         assert {'consented_at', 'consent_version'} <= {row[1] for row in db.execute('PRAGMA table_info(students)')}
         assert db.execute('SELECT inference_mode FROM attentiveness_readings').fetchone()[0] == 'geometric'
+        assert {'boredom', 'confusion'} <= {row[1] for row in db.execute('PRAGMA table_info(attentiveness_readings)')}

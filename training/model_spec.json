@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "task": "daisee-affect",
+  "input": {
+    "shape": [
+      224,
+      224,
+      3
+    ],
+    "color_order": "RGB",
+    "normalization": "rgb_mean",
+    "mean": [
+      103.939,
+      116.779,
+      123.68
+    ]
+  },
+  "labels": [
+    "very_low",
+    "low",
+    "high",
+    "very_high"
+  ],
+  "outputs": {
+    "engagement": 0,
+    "boredom": 1,
+    "confusion": 2
+  },
+  "crop_margin": 0.1,
+  "sampling_fps": 2,
+  "source": {
+    "project": "EmotiEffLib",
+    "model": "mobilenet_7.h5",
+    "feature_layer": "feats",
+    "url": "https://raw.githubusercontent.com/sb-ai-lab/EmotiEffLib/main/models/affectnet_emotions/mobilenet_7.h5",
+    "reference": "https://github.com/sb-ai-lab/EmotiEffLib",
+    "preprocessing_reference": "https://github.com/sb-ai-lab/EmotiEffLib/blob/main/training_and_examples/affectnet/train_emotions.ipynb"
+  }
+}

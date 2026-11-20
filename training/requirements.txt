@@ -1,0 +1,10 @@
+# Use a separate Python 3.10 or 3.11 virtual environment.
+tensorflow==2.15.1
+numpy==1.26.4
+scipy==1.12.0
+mediapipe==0.10.14
+opencv-contrib-python==4.10.0.84
+scikit-learn==1.4.2
+# Keep JAX compatible with TensorFlow 2.15's ml-dtypes dependency.
+jax==0.4.23
+jaxlib==0.4.23

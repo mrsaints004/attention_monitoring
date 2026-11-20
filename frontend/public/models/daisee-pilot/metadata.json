@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "task": "daisee-engagement-pilot",
+  "dataset": "DAiSEE",
+  "status": "sample_pilot_completed",
+  "input": {
+    "shape": [
+      32,
+      32,
+      3
+    ],
+    "region": "full_frame",
+    "color_order": "RGB",
+    "normalization": "divide_by_255",
+    "live_resize": "bilinear"
+  },
+  "labels": [
+    "very_low",
+    "low",
+    "high",
+    "very_high"
+  ],
+  "sampling_fps": 2,
+  "model_sha256": "4358fccf8b154ffebb0fa9c0d243065702d0448cdf8937e41c1dd1d61118053f",
+  "weights_sha256": "e8d0fe9f946a0dbacb90c32bdfbde8d2dc1213f6d8b8dd1ce0929d009148b5c0",
+  "training": {
+    "clips": 4,
+    "epochs": 30,
+    "selected_epoch": 3
+  },
+  "validation": {
+    "clips": 4,
+    "accuracy": 0.25
+  },
+  "test": {
+    "clips": 4,
+    "accuracy": 0.25,
+    "macro_f1": 0.125
+  },
+  "replay": {
+    "status": "passed",
+    "absolute_tolerance": 0.000001,
+    "maximum_probability_difference": 0
+  },
+  "scope": "Trained 12-clip engagement-only pilot; auxiliary experiment; not part of the Attention Index",
+  "limitations": [
+    "No boredom or confusion outputs",
+    "Four test clips; accuracy does not establish live generalisation",
+    "Full-frame imagery can encode background and identity",
+    "Live bilinear resizing differs from FFmpeg training-frame scaling"
+  ]
+}

@@ -4,6 +4,8 @@ const API_WS_BASE = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8000";
 export interface DashboardStudentData {
   student_id: string;
   display_name: string;
+  boredom?: number | null;
+  confusion?: number | null;
   inference_mode?: "geometric" | "four_cue";
   attention_index: number | null;
   quality_flag: string;

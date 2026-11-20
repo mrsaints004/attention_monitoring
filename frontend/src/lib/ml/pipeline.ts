@@ -2,7 +2,7 @@ import { initFaceMesh, detectFrame, getLandmarks } from "./faceMesh";
 import { EyeStateTracker, getAverageEAR } from "./eyeState";
 import { computeGazeScore } from "./headPose";
 import { YawnTracker, computeMAR } from "./yawnDetection";
-import { inferExpression, loadAffectModel } from "./affectScoring";
+import { inferAffect, loadAffectModel } from "./affectScoring";
 import { CueFusion } from "./cueFusion";
 import { Calibrator, CalibrationData } from "./calibration";
 import { QualityFlag } from "./qualityFlags";
@@ -12,6 +12,7 @@ export interface AttentionReading {
   sEye: number; sGaze: number; sYawn: number; sAffect: number;
   attentionIndex: number | null; qualityFlag: QualityFlag; timestamp: number;
   affectAvailable?: boolean;
+  boredom?: number | null; confusion?: number | null;
 }
 export type PipelineState = "idle" | "calibrating" | "running" | "paused";
 export type PipelineListener = (reading: AttentionReading) => void;
@@ -29,6 +30,7 @@ export class AttentionPipeline {
   private automaticCalibration = false;
   private affectAvailable = false;
   private lastAffect = 0.5;
+  private affectWindow: { timestamp: number; engagement: number; boredom: number; confusion: number }[] = [];
   private lastAffectTime = 0;
   private busy = false;
   private heartbeat: ReturnType<typeof setInterval> | null = null;
@@ -65,9 +67,9 @@ export class AttentionPipeline {
   getCalibrationData() { return this.calibration; }
   startMonitoring() { this.monitoringSince = Date.now(); this.frameTimes = []; if (!this.calibration) throw new Error("Calibration is required. Please rejoin the session."); this.lastFrameTime = Date.now(); this.setState("running"); this.startLoop(); }
   pause() { this.setState("paused"); this.emitUnavailable("monitoring_paused"); }
-  resume() { this.missingSince = 0; this.monitoringSince = Date.now(); this.frameTimes = []; this.fusion.reset(); this.eye = new EyeStateTracker(); this.yawn = new YawnTracker(); if (this.calibration) this.setCalibrationData(this.calibration); this.setState("running"); }
-  stop() { this.throttle.stop(); if (this.heartbeat) clearInterval(this.heartbeat); this.heartbeat = null; this.fusion.reset(); this.setState("idle"); }
-  private emitUnavailable(flag: QualityFlag) { this.eye = new EyeStateTracker(); this.yawn = new YawnTracker(); this.fusion.reset(); if (this.calibration) this.setCalibrationData(this.calibration); this.listeners.forEach(cb => cb({ sEye: 0, sGaze: 0, sYawn: 0, sAffect: 0, attentionIndex: null, qualityFlag: flag, timestamp: Date.now(), affectAvailable: this.affectAvailable })); }
+  resume() { this.affectWindow = []; this.missingSince = 0; this.monitoringSince = Date.now(); this.frameTimes = []; this.fusion.reset(); this.eye = new EyeStateTracker(); this.yawn = new YawnTracker(); if (this.calibration) this.setCalibrationData(this.calibration); this.setState("running"); }
+  stop() { this.affectWindow = []; this.throttle.stop(); if (this.heartbeat) clearInterval(this.heartbeat); this.heartbeat = null; this.fusion.reset(); this.setState("idle"); }
+  private emitUnavailable(flag: QualityFlag) { this.affectWindow = []; this.eye = new EyeStateTracker(); this.yawn = new YawnTracker(); this.fusion.reset(); if (this.calibration) this.setCalibrationData(this.calibration); this.listeners.forEach(cb => cb({ sEye: 0, sGaze: 0, sYawn: 0, sAffect: 0, attentionIndex: null, qualityFlag: flag, timestamp: Date.now(), affectAvailable: this.affectAvailable })); }
   private async processFrame() {
     if (this.busy || !this.video || this.state === "idle" || this.state === "paused") return;
     this.busy = true;
@@ -121,12 +123,19 @@ export class AttentionPipeline {
       const { sGaze } = computeGazeScore(landmarks, this.calibration?.baselineYaw ?? 0, this.calibration?.baselinePitch ?? 0, this.video.videoWidth / this.video.videoHeight);
       const sYawn = this.yawn.process(computeMAR(landmarks), now);
       if (this.affectAvailable && now - this.lastAffectTime >= 333) {
-        try { this.lastAffect = await inferExpression(this.video, landmarks, this.video.videoWidth, this.video.videoHeight); }
+        try {
+          const prediction = await inferAffect(this.video, landmarks);
+          this.affectWindow.push({ timestamp: now, ...prediction });
+          this.affectWindow = this.affectWindow.filter(sample => now - sample.timestamp <= 2000);
+          this.lastAffect = this.affectWindow.reduce((sum, sample) => sum + sample.engagement, 0) / this.affectWindow.length;
+        }
         catch { this.affectAvailable = false; }
         this.lastAffectTime = now;
       }
+      const boredom = this.affectAvailable && this.affectWindow.length ? this.affectWindow.reduce((sum, sample) => sum + sample.boredom, 0) / this.affectWindow.length : null;
+      const confusion = this.affectAvailable && this.affectWindow.length ? this.affectWindow.reduce((sum, sample) => sum + sample.confusion, 0) / this.affectWindow.length : null;
       const { attentionIndex } = this.fusion.compute({ sEye, sGaze, sYawn, sAffect: this.lastAffect }, eyesClosedDuration, this.affectAvailable);
-      this.listeners.forEach(cb => cb({ sEye, sGaze, sYawn, sAffect: this.lastAffect, attentionIndex, qualityFlag: "normal", timestamp: now, affectAvailable: this.affectAvailable }));
+      this.listeners.forEach(cb => cb({ sEye, sGaze, sYawn, sAffect: this.lastAffect, boredom, confusion, attentionIndex, qualityFlag: "normal", timestamp: now, affectAvailable: this.affectAvailable }));
     } catch { this.emitUnavailable("low_confidence"); }
     finally { this.busy = false; }
   }

@@ -89,3 +89,28 @@ def test_consent_required_and_student_can_withdraw():
         with pytest.raises(WebSocketDisconnect):
             with client.websocket_connect(f'/ws/student/{sid}/{student["student_id"]}', subprotocols=['attention', student['device_token']]):
                 pass
+
+
+def test_affect_details_survive_ingestion_dashboard_and_export():
+    with TestClient(app) as client:
+        session, headers = create(client)
+        sid = session['session_id']
+        student = join(client, sid)
+        with client.websocket_connect(f'/ws/student/{sid}/{student["student_id"]}', subprotocols=['attention', student['device_token']]) as ws:
+            ws.send_json(dict(s_eye=1, s_gaze=1, s_yawn=1, s_affect=0.8,
+                              attention_index=90, quality_flag='normal', inference_mode='four_cue',
+                              boredom=0.15, confusion=0.25))
+            ws.send_json({'invalid': True})
+            assert ws.receive_json()['type'] == 'error'
+            reading = client.get(f'/api/sessions/{sid}/readings', headers=headers).json()[0]
+            assert reading['boredom'] == 0.15 and reading['confusion'] == 0.25
+            assert reading['inference_mode'] == 'four_cue'
+            with client.websocket_connect(f'/ws/instructor/{sid}', subprotocols=['attention', session['instructor_token']]) as dashboard:
+                data = dashboard.receive_json()
+                assert data['students'][0]['boredom'] == 0.15
+                assert data['students'][0]['confusion'] == 0.25
+            import csv
+            import io
+            export = client.get(f'/api/sessions/{sid}/export', headers=headers)
+            row = next(csv.DictReader(io.StringIO(export.text)))
+            assert row['boredom'] == '0.15' and row['confusion'] == '0.25'

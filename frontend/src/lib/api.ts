@@ -49,6 +49,8 @@ export interface ReadingData {
   s_gaze: number;
   s_yawn: number;
   s_affect: number;
+  boredom?: number | null;
+  confusion?: number | null;
   inference_mode?: "geometric" | "four_cue";
   attention_index: number | null;
   quality_flag: string;

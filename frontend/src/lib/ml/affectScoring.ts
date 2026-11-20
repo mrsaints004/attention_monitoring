@@ -1,101 +1,68 @@
 import * as tf from "@tensorflow/tfjs";
-import { NormalizedLandmark } from "./faceMesh";
+import type { NormalizedLandmark } from "./faceMesh";
+import { AffectModelSpec, expectedAffectLevel, parseAffectModelSpec } from "./affectModelSpec";
 
-// Optional DAiSEE model contract: [1,48,48,1] input, four engagement
-// probabilities ordered Very Low, Low, High, Very High.
+export interface AffectPrediction { engagement: number; boredom: number; confusion: number; }
 let model: tf.LayersModel | null = null;
+let spec: AffectModelSpec | null = null;
 let modelPromise: Promise<boolean> | null = null;
-let modelFailed = false;
 
 export async function loadAffectModel(): Promise<boolean> {
   if (model) return true;
-  if (modelFailed) return false;
   if (!modelPromise) modelPromise = (async () => {
+    let loaded: tf.LayersModel | null = null;
     try {
-      const loaded = await tf.loadLayersModel("/models/fer/model.json");
-      const output = loaded.outputs[0].shape;
-      if (loaded.inputs.length !== 1 || loaded.outputs.length !== 1 || output[output.length - 1] !== 4 || loaded.inputs[0].shape.slice(1).join(",") !== "48,48,1") {
-        loaded.dispose();
-        throw new Error("Engagement model requires 48×48 grayscale input and four DAiSEE probabilities");
+      const response = await fetch("/models/fer/metadata.json");
+      if (!response.ok) return false;
+      const metadata = parseAffectModelSpec(await response.json());
+      loaded = await tf.loadLayersModel("/models/fer/model.json");
+      if (loaded.inputs.length !== 1 || loaded.outputs.length !== 3 ||
+          JSON.stringify(loaded.inputs[0].shape.slice(1)) !== JSON.stringify(metadata.input.shape) ||
+          loaded.outputNames.join(",") !== "engagement,boredom,confusion" ||
+          loaded.outputs.some(output => output.shape.length !== 2 || output.shape[1] !== 4)) {
+        throw new Error("Checkpoint does not match its declared MobileNet interface");
       }
+      // Exercise supported operators before treating the model as available.
+      const warmup = tf.zeros([1, ...metadata.input.shape]);
+      let predictions: tf.Tensor[] = [];
+      try {
+        predictions = loaded.predict(warmup) as tf.Tensor[];
+        for (const prediction of predictions) expectedAffectLevel(await prediction.data());
+      } finally { warmup.dispose(); predictions.forEach(prediction => prediction.dispose()); }
       model = loaded;
+      spec = metadata;
       return true;
     } catch {
-      console.warn("DAiSEE affect model unavailable; using explicitly labelled geometric-cue mode");
-      modelFailed = true;
+      loaded?.dispose();
+      console.warn("Compatible fine-tuned affect model unavailable; using geometric cues");
       return false;
     }
   })();
   return modelPromise;
 }
 
-export async function inferExpression(
-  video: HTMLVideoElement,
-  landmarks: NormalizedLandmark[],
-  videoWidth: number,
-  videoHeight: number
-): Promise<number> {
-  if (model) {
-    return inferWithModel(video, landmarks, videoWidth, videoHeight);
-  }
-  throw new Error("Facial-affect model is unavailable");
-}
-
-async function inferWithModel(
-  video: HTMLVideoElement,
-  landmarks: NormalizedLandmark[],
-  videoWidth: number,
-  videoHeight: number
-): Promise<number> {
-  // Crop face region from video
-  const bbox = getFaceBoundingBox(landmarks, videoWidth, videoHeight);
-
-  const score = tf.tidy(() => {
-    let tensor = tf.browser.fromPixels(video);
-    // Crop face
-    tensor = tf.image.cropAndResize(
-      tensor.expandDims(0).toFloat() as tf.Tensor4D,
-      [[bbox.y1 / videoHeight, bbox.x1 / videoWidth, bbox.y2 / videoHeight, bbox.x2 / videoWidth]],
-      [0],
-      [48, 48]
-    ).squeeze() as tf.Tensor3D;
-
-    // Convert to grayscale
-    const gray = tensor.mean(2).expandDims(-1).expandDims(0).div(255);
-    const prediction = model!.predict(gray) as tf.Tensor;
-    const scores = prediction.dataSync();
-
-    if (scores.length !== 4 || Array.from(scores).some(p => !Number.isFinite(p) || p < 0)) throw new Error("Invalid model probabilities");
-    const total = Array.from(scores).reduce((a, b) => a + b, 0);
-    if (total <= 0) throw new Error("Invalid model probabilities");
-    return (scores[1] + 2 * scores[2] + 3 * scores[3]) / (3 * total);
+export function prepareAffectInput(pixels: tf.Tensor3D, box: [number, number, number, number], metadata: AffectModelSpec): tf.Tensor4D {
+  return tf.tidy(() => {
+    const [height, width] = metadata.input.shape;
+    const crop = tf.image.cropAndResize(pixels.toFloat().expandDims(0) as tf.Tensor4D, [box], [0], [height, width]);
+    // Preparation stores lossless uint8 crops; apply the same truncation here.
+    return crop.floor().sub(tf.tensor1d(metadata.input.mean)) as tf.Tensor4D;
   });
-
-  return Math.max(0, Math.min(1, score));
 }
 
-function getFaceBoundingBox(
-  landmarks: NormalizedLandmark[],
-  width: number,
-  height: number
-): { x1: number; y1: number; x2: number; y2: number } {
-  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-  for (const lm of landmarks) {
-    const x = lm.x * width;
-    const y = lm.y * height;
-    if (x < minX) minX = x;
-    if (y < minY) minY = y;
-    if (x > maxX) maxX = x;
-    if (y > maxY) maxY = y;
-  }
-  // Add margin
-  const margin = 0.1;
-  const w = maxX - minX;
-  const h = maxY - minY;
-  return {
-    x1: Math.max(0, minX - w * margin),
-    y1: Math.max(0, minY - h * margin),
-    x2: Math.min(width, maxX + w * margin),
-    y2: Math.min(height, maxY + h * margin),
-  };
+export async function inferAffect(video: HTMLVideoElement, landmarks: NormalizedLandmark[]): Promise<AffectPrediction> {
+  if (!model || !spec) throw new Error("Facial-affect model is unavailable");
+  const xs = landmarks.map(point => point.x), ys = landmarks.map(point => point.y);
+  const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
+  const dx = (maxX - minX) * spec.crop_margin, dy = (maxY - minY) * spec.crop_margin;
+  const box: [number, number, number, number] = [Math.max(0, minY - dy), Math.max(0, minX - dx), Math.min(1, maxY + dy), Math.min(1, maxX + dx)];
+  if (box.some(value => !Number.isFinite(value)) || box[2] <= box[0] || box[3] <= box[1]) throw new Error("Invalid face region");
+  const predictions = tf.tidy(() => {
+    const input = prepareAffectInput(tf.browser.fromPixels(video), box, spec!);
+    return model!.predict(input) as tf.Tensor[];
+  });
+  try {
+    const [engagement, boredom, confusion] = await Promise.all(predictions.map(async prediction => expectedAffectLevel(await prediction.data())));
+    return { engagement, boredom, confusion };
+  } finally { predictions.forEach(prediction => prediction.dispose()); }
 }

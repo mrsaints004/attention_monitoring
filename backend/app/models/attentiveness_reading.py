@@ -28,6 +28,8 @@ class AttentivenessReading(Base):
     s_gaze: Mapped[float] = mapped_column(Float)
     s_yawn: Mapped[float] = mapped_column(Float)
     s_affect: Mapped[float] = mapped_column(Float)
+    boredom: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    confusion: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     attention_index: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     quality_flag: Mapped[QualityFlag] = mapped_column(Enum(QualityFlag), default=QualityFlag.normal)
 

@@ -1,0 +1,689 @@
+{
+  "dataset": "DAiSEE",
+  "scope": "Exploratory 12-clip engagement-only CNN; not the full benchmark or the production three-head affect model",
+  "partitions": {
+    "Train": {
+      "sample_clips": 4,
+      "subjects": 3,
+      "prepared_frames": 80,
+      "full_csv_rows": 5358,
+      "label_counts": {
+        "engagement": {
+          "0": 1,
+          "1": 1,
+          "2": 1,
+          "3": 1
+        },
+        "boredom": {
+          "2": 1,
+          "0": 3
+        },
+        "confusion": {
+          "0": 4
+        }
+      }
+    },
+    "Validation": {
+      "sample_clips": 4,
+      "subjects": 1,
+      "prepared_frames": 80,
+      "full_csv_rows": 1429,
+      "label_counts": {
+        "engagement": {
+          "0": 1,
+          "1": 1,
+          "2": 1,
+          "3": 1
+        },
+        "boredom": {
+          "2": 1,
+          "1": 2,
+          "0": 1
+        },
+        "confusion": {
+          "2": 1,
+          "1": 1,
+          "0": 2
+        }
+      }
+    },
+    "Test": {
+      "sample_clips": 4,
+      "subjects": 2,
+      "prepared_frames": 80,
+      "full_csv_rows": 1784,
+      "label_counts": {
+        "engagement": {
+          "0": 1,
+          "1": 1,
+          "2": 1,
+          "3": 1
+        },
+        "boredom": {
+          "3": 1,
+          "2": 1,
+          "1": 1,
+          "0": 1
+        },
+        "confusion": {
+          "2": 1,
+          "1": 1,
+          "0": 2
+        }
+      }
+    }
+  },
+  "raw_bytes": 15753172,
+  "preprocessing": {
+    "region": "full_frame",
+    "shape": [
+      32,
+      32,
+      3
+    ],
+    "sampling_fps": 2,
+    "normalization": "divide_by_255",
+    "purpose": "exploratory engagement-only CNN"
+  },
+  "model_parameters": 1212,
+  "epochs": 30,
+  "selected_epoch": 3,
+  "selection": "Highest validation clip-level macro-F1; first epoch retained on ties; held-out test scored after selection",
+  "history": [
+    {
+      "epoch": 1,
+      "training_loss": 1.3880137205123901,
+      "validation_accuracy": 0.25,
+      "validation_macro_f1": 0.16666666666666666
+    },
+    {
+      "epoch": 2,
+      "training_loss": 1.2683721780776978,
+      "validation_accuracy": 0.25,
+      "validation_macro_f1": 0.16666666666666666
+    },
+    {
+      "epoch": 3,
+      "training_loss": 1.1555103063583374,
+      "validation_accuracy": 0.25,
+      "validation_macro_f1": 0.25
+    },
+    {
+      "epoch": 4,
+      "training_loss": 1.0179001092910767,
+      "validation_accuracy": 0.25,
+      "validation_macro_f1": 0.25
+    },
+    {
+      "epoch": 5,
+      "training_loss": 0.8707634806632996,
+      "validation_accuracy": 0,
+      "validation_macro_f1": 0
+    },
+    {
+      "epoch": 6,
+      "training_loss": 0.7143406271934509,
+      "validation_accuracy": 0,
+      "validation_macro_f1": 0
+    },
+    {
+      "epoch": 7,
+      "training_loss": 0.5738090872764587,
+      "validation_accuracy": 0,
+      "validation_macro_f1": 0
+    },
+    {
+      "epoch": 8,
+      "training_loss": 0.4665434956550598,
+      "validation_accuracy": 0,
+      "validation_macro_f1": 0
+    },
+    {
+      "epoch": 9,
+      "training_loss": 0.3970937430858612,
+      "validation_accuracy": 0,
+      "validation_macro_f1": 0
+    },
+    {
+      "epoch": 10,
+      "training_loss": 0.3563288450241089,
+      "validation_accuracy": 0,
+      "validation_macro_f1": 0
+    },
+    {
+      "epoch": 11,
+      "training_loss": 0.3309060037136078,
+      "validation_accuracy": 0,
+      "validation_macro_f1": 0
+    },
+    {
+      "epoch": 12,
+      "training_loss": 0.31308436393737793,
+      "validation_accuracy": 0,
+      "validation_macro_f1": 0
+    },
+    {
+      "epoch": 13,
+      "training_loss": 0.2997492253780365,
+      "validation_accuracy": 0,
+      "validation_macro_f1": 0
+    },
+    {
+      "epoch": 14,
+      "training_loss": 0.28850388526916504,
+      "validation_accuracy": 0,
+      "validation_macro_f1": 0
+    },
+    {
+      "epoch": 15,
+      "training_loss": 0.2774033844470978,
+      "validation_accuracy": 0,
+      "validation_macro_f1": 0
+    },
+    {
+      "epoch": 16,
+      "training_loss": 0.2681710422039032,
+      "validation_accuracy": 0,
+      "validation_macro_f1": 0
+    },
+    {
+      "epoch": 17,
+      "training_loss": 0.2587009370326996,
+      "validation_accuracy": 0,
+      "validation_macro_f1": 0
+    },
+    {
+      "epoch": 18,
+      "training_loss": 0.24907098710536957,
+      "validation_accuracy": 0,
+      "validation_macro_f1": 0
+    },
+    {
+      "epoch": 19,
+      "training_loss": 0.24095168709754944,
+      "validation_accuracy": 0,
+      "validation_macro_f1": 0
+    },
+    {
+      "epoch": 20,
+      "training_loss": 0.23135264217853546,
+      "validation_accuracy": 0,
+      "validation_macro_f1": 0
+    },
+    {
+      "epoch": 21,
+      "training_loss": 0.22296324372291565,
+      "validation_accuracy": 0,
+      "validation_macro_f1": 0
+    },
+    {
+      "epoch": 22,
+      "training_loss": 0.21413078904151917,
+      "validation_accuracy": 0,
+      "validation_macro_f1": 0
+    },
+    {
+      "epoch": 23,
+      "training_loss": 0.20560263097286224,
+      "validation_accuracy": 0,
+      "validation_macro_f1": 0
+    },
+    {
+      "epoch": 24,
+      "training_loss": 0.19782112538814545,
+      "validation_accuracy": 0,
+      "validation_macro_f1": 0
+    },
+    {
+      "epoch": 25,
+      "training_loss": 0.18956170976161957,
+      "validation_accuracy": 0,
+      "validation_macro_f1": 0
+    },
+    {
+      "epoch": 26,
+      "training_loss": 0.18217599391937256,
+      "validation_accuracy": 0,
+      "validation_macro_f1": 0
+    },
+    {
+      "epoch": 27,
+      "training_loss": 0.1747741997241974,
+      "validation_accuracy": 0,
+      "validation_macro_f1": 0
+    },
+    {
+      "epoch": 28,
+      "training_loss": 0.16760282218456268,
+      "validation_accuracy": 0,
+      "validation_macro_f1": 0
+    },
+    {
+      "epoch": 29,
+      "training_loss": 0.1602839082479477,
+      "validation_accuracy": 0,
+      "validation_macro_f1": 0
+    },
+    {
+      "epoch": 30,
+      "training_loss": 0.15333841741085052,
+      "validation_accuracy": 0,
+      "validation_macro_f1": 0
+    }
+  ],
+  "splits": {
+    "Train": {
+      "clips": 4,
+      "accuracy": 0.75,
+      "macro_f1": 0.6666666666666666,
+      "confusion_matrix": [
+        [
+          1,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          1,
+          0
+        ]
+      ],
+      "binary_accuracy": 1,
+      "predictions": [
+        {
+          "clip_id": "1100131017",
+          "subject_id": "110013",
+          "split": "Train",
+          "label": 0,
+          "predicted": 0,
+          "probabilities": [
+            0.41995853185653687,
+            0.23339375853538513,
+            0.18696297705173492,
+            0.15968473255634308
+          ],
+          "expected_level": 0.36212463676929474
+        },
+        {
+          "clip_id": "1100021003",
+          "subject_id": "110002",
+          "split": "Train",
+          "label": 1,
+          "predicted": 1,
+          "probabilities": [
+            0.2542136609554291,
+            0.3982742428779602,
+            0.18905223906040192,
+            0.1584598422050476
+          ],
+          "expected_level": 0.4172527492046356
+        },
+        {
+          "clip_id": "1100011002",
+          "subject_id": "110001",
+          "split": "Train",
+          "label": 2,
+          "predicted": 2,
+          "probabilities": [
+            0.23188850283622742,
+            0.20280787348747253,
+            0.2947476804256439,
+            0.27055594325065613
+          ],
+          "expected_level": 0.5346570213635763
+        },
+        {
+          "clip_id": "1100011004",
+          "subject_id": "110001",
+          "split": "Train",
+          "label": 3,
+          "predicted": 2,
+          "probabilities": [
+            0.2347952425479889,
+            0.1966766119003296,
+            0.2883910834789276,
+            0.2801370322704315
+          ],
+          "expected_level": 0.5379566252231598
+        }
+      ]
+    },
+    "Validation": {
+      "clips": 4,
+      "accuracy": 0.25,
+      "macro_f1": 0.25,
+      "confusion_matrix": [
+        [
+          0,
+          0,
+          0,
+          1
+        ],
+        [
+          0,
+          1,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0,
+          0
+        ]
+      ],
+      "binary_accuracy": 0.25,
+      "predictions": [
+        {
+          "clip_id": "4000222032",
+          "subject_id": "400022",
+          "split": "Validation",
+          "label": 0,
+          "predicted": 3,
+          "probabilities": [
+            0.2397303283214569,
+            0.2580643594264984,
+            0.23592570424079895,
+            0.26627957820892334
+          ],
+          "expected_level": 0.5095848341782888
+        },
+        {
+          "clip_id": "4000221040",
+          "subject_id": "400022",
+          "split": "Validation",
+          "label": 1,
+          "predicted": 1,
+          "probabilities": [
+            0.24954670667648315,
+            0.2702409029006958,
+            0.22241291403770447,
+            0.2577994763851166
+          ],
+          "expected_level": 0.4961550533771515
+        },
+        {
+          "clip_id": "4000221001",
+          "subject_id": "400022",
+          "split": "Validation",
+          "label": 2,
+          "predicted": 0,
+          "probabilities": [
+            0.3094165027141571,
+            0.27972498536109924,
+            0.20607890188694,
+            0.20477962493896484
+          ],
+          "expected_level": 0.43540722131729126
+        },
+        {
+          "clip_id": "4000221002",
+          "subject_id": "400022",
+          "split": "Validation",
+          "label": 3,
+          "predicted": 0,
+          "probabilities": [
+            0.3159620761871338,
+            0.2884639501571655,
+            0.20355063676834106,
+            0.1920233517885208
+          ],
+          "expected_level": 0.4238784263531367
+        }
+      ]
+    },
+    "Test": {
+      "clips": 4,
+      "accuracy": 0.25,
+      "macro_f1": 0.125,
+      "confusion_matrix": [
+        [
+          1,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0,
+          0
+        ]
+      ],
+      "binary_accuracy": 0.5,
+      "predictions": [
+        {
+          "clip_id": "5100342022",
+          "subject_id": "510034",
+          "split": "Test",
+          "label": 0,
+          "predicted": 0,
+          "probabilities": [
+            0.3010970652103424,
+            0.2697433829307556,
+            0.21553651988506317,
+            0.2136230170726776
+          ],
+          "expected_level": 0.44722849130630493
+        },
+        {
+          "clip_id": "5000441024",
+          "subject_id": "500044",
+          "split": "Test",
+          "label": 1,
+          "predicted": 0,
+          "probabilities": [
+            0.2931508421897888,
+            0.2874462306499481,
+            0.20082661509513855,
+            0.21857629716396332
+          ],
+          "expected_level": 0.4482761174440384
+        },
+        {
+          "clip_id": "5000441001",
+          "subject_id": "500044",
+          "split": "Test",
+          "label": 2,
+          "predicted": 1,
+          "probabilities": [
+            0.2769741117954254,
+            0.29675307869911194,
+            0.20729227364063263,
+            0.21898053586483002
+          ],
+          "expected_level": 0.45609307785828906
+        },
+        {
+          "clip_id": "5000441009",
+          "subject_id": "500044",
+          "split": "Test",
+          "label": 3,
+          "predicted": 0,
+          "probabilities": [
+            0.2855028510093689,
+            0.27080804109573364,
+            0.21273905038833618,
+            0.23095007240772247
+          ],
+          "expected_level": 0.4630454530318578
+        }
+      ]
+    }
+  },
+  "weights_sha256": "e8d0fe9f946a0dbacb90c32bdfbde8d2dc1213f6d8b8dd1ce0929d009148b5c0",
+  "inventory_sha256": "5b012dcfc15b52db4633b67823d0e0a724ee936952257c811d32827f631e994a",
+  "limitations": [
+    "Four selected training clips, four validation clips, four test clips; not a representative sample",
+    "Full-frame 32x32 input; no face crop or pretrained backbone",
+    "Validation contains only one subject; background and identity confounding remain possible",
+    "No boredom/confusion heads were trained; training confusion labels have only class 0",
+    "These scores do not establish deployment readiness or the research hypothesis"
+  ],
+  "clips": [
+    {
+      "clip_id": "1100131017",
+      "split": "Train",
+      "frames": 20,
+      "labels": {
+        "boredom": 2,
+        "engagement": 0,
+        "confusion": 0,
+        "frustration": 0
+      }
+    },
+    {
+      "clip_id": "1100021003",
+      "split": "Train",
+      "frames": 20,
+      "labels": {
+        "boredom": 0,
+        "engagement": 1,
+        "confusion": 0,
+        "frustration": 0
+      }
+    },
+    {
+      "clip_id": "1100011002",
+      "split": "Train",
+      "frames": 20,
+      "labels": {
+        "boredom": 0,
+        "engagement": 2,
+        "confusion": 0,
+        "frustration": 0
+      }
+    },
+    {
+      "clip_id": "1100011004",
+      "split": "Train",
+      "frames": 20,
+      "labels": {
+        "boredom": 0,
+        "engagement": 3,
+        "confusion": 0,
+        "frustration": 0
+      }
+    },
+    {
+      "clip_id": "4000222032",
+      "split": "Validation",
+      "frames": 20,
+      "labels": {
+        "boredom": 2,
+        "engagement": 0,
+        "confusion": 2,
+        "frustration": 2
+      }
+    },
+    {
+      "clip_id": "4000221040",
+      "split": "Validation",
+      "frames": 20,
+      "labels": {
+        "boredom": 1,
+        "engagement": 1,
+        "confusion": 1,
+        "frustration": 1
+      }
+    },
+    {
+      "clip_id": "4000221001",
+      "split": "Validation",
+      "frames": 20,
+      "labels": {
+        "boredom": 0,
+        "engagement": 2,
+        "confusion": 0,
+        "frustration": 0
+      }
+    },
+    {
+      "clip_id": "4000221002",
+      "split": "Validation",
+      "frames": 20,
+      "labels": {
+        "boredom": 1,
+        "engagement": 3,
+        "confusion": 0,
+        "frustration": 0
+      }
+    },
+    {
+      "clip_id": "5100342022",
+      "split": "Test",
+      "frames": 20,
+      "labels": {
+        "boredom": 3,
+        "engagement": 0,
+        "confusion": 2,
+        "frustration": 3
+      }
+    },
+    {
+      "clip_id": "5000441024",
+      "split": "Test",
+      "frames": 20,
+      "labels": {
+        "boredom": 2,
+        "engagement": 1,
+        "confusion": 1,
+        "frustration": 0
+      }
+    },
+    {
+      "clip_id": "5000441001",
+      "split": "Test",
+      "frames": 20,
+      "labels": {
+        "boredom": 1,
+        "engagement": 2,
+        "confusion": 0,
+        "frustration": 0
+      }
+    },
+    {
+      "clip_id": "5000441009",
+      "split": "Test",
+      "frames": 20,
+      "labels": {
+        "boredom": 0,
+        "engagement": 3,
+        "confusion": 0,
+        "frustration": 0
+      }
+    }
+  ]
+}

@@ -39,13 +39,13 @@ async def export_session(
     writer.writerow([
         "timestamp", "student_id", "display_name",
         "s_eye", "s_gaze", "s_yawn", "s_affect",
-        "attention_index", "quality_flag", "inference_mode",
+        "attention_index", "quality_flag", "inference_mode", "boredom", "confusion",
     ])
     for r in readings:
         writer.writerow([
             r.timestamp.isoformat(), r.student_id, safe_cell(r.student.display_name),
             r.s_eye, r.s_gaze, r.s_yawn, r.s_affect,
-            r.attention_index, r.quality_flag.value, r.inference_mode,
+            r.attention_index, r.quality_flag.value, r.inference_mode, r.boredom, r.confusion,
         ])
 
     output.seek(0)

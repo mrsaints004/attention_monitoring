@@ -1,0 +1,5 @@
+Backbone: EmotiEffLib mobilenet_7.h5, face-pretrained then adapted to DAiSEE.
+https://github.com/sb-ai-lab/EmotiEffLib
+Savchenko et al., Classifying emotions and engagement in online learning based on a single facial expression recognition neural network (2022).
+Gupta et al., DAiSEE: Towards User Engagement Recognition in the Wild.
+Review upstream checkpoint/dataset redistribution terms before publishing weights.

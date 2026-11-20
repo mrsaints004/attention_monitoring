@@ -1,0 +1,9 @@
+{
+  "project": "EmotiEffLib",
+  "model": "mobilenet_7.h5",
+  "feature_layer": "feats",
+  "url": "https://raw.githubusercontent.com/sb-ai-lab/EmotiEffLib/main/models/affectnet_emotions/mobilenet_7.h5",
+  "reference": "https://github.com/sb-ai-lab/EmotiEffLib",
+  "preprocessing_reference": "https://github.com/sb-ai-lab/EmotiEffLib/blob/main/training_and_examples/affectnet/train_emotions.ipynb",
+  "sha256": "63c8cd21321d28f7b6a9a8db29e74548cd7b5999a58d4dfb98a28f21027075dc"
+}

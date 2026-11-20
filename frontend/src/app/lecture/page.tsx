@@ -3,6 +3,7 @@ import { useEffect, useRef, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useCamera } from "@/hooks/useCamera";
 import { useAttentionPipeline } from "@/hooks/useAttentionPipeline";
+import { TrainedAffect } from "@/components/TrainedAffect";
 import { SelfView } from "@/components/SelfView";
 import { MonitoringIndicator } from "@/components/MonitoringIndicator";
 import { LectureMedia } from "@/components/LectureMedia";
@@ -79,6 +80,7 @@ function LecturePageContent() {
       {state === "calibrating" && <p role="status" className="rounded bg-blue-50 p-4">Recalibrating after your return. Look at the screen with your eyes open. {Math.round(calibrationProgress * 100)}%</p>}
       {latestReading && !latestReading.affectAvailable && <p className="text-sm text-gray-700">Experimental three-cue mode: eye state, gaze and yawning. Facial-affect model unavailable. Scores are estimates for teaching support, not assessment.</p>}
       {latestReading?.qualityFlag === "low_confidence" && <p role="status" className="text-amber-800">Improve the lighting and keep only your face in view. No attention score is reported while the image is unreliable.</p>}
+      <TrainedAffect reading={latestReading} running={state === "running"} />
       <div className="w-48"><SelfView stream={mediaStream} /></div>
     </div>
     <video ref={video} autoPlay playsInline muted className="sr-only" />

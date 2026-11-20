@@ -32,7 +32,7 @@ export class ReadingSocket {
   private flush() {
     this.buffer = this.buffer.filter(r => Date.now() - r.timestamp < 30000);
     if (!this.buffer.length || this.ws?.readyState !== WebSocket.OPEN) return;
-    const batch = this.buffer.slice(0, 100).map(r => ({ s_eye: r.sEye, s_gaze: r.sGaze, s_yawn: r.sYawn, s_affect: r.sAffect, inference_mode: r.affectAvailable ? "four_cue" : "geometric", attention_index: r.attentionIndex, quality_flag: r.qualityFlag, timestamp: new Date(r.timestamp).toISOString() }));
+    const batch = this.buffer.slice(0, 100).map(r => ({ s_eye: r.sEye, s_gaze: r.sGaze, s_yawn: r.sYawn, s_affect: r.sAffect, boredom: r.boredom ?? null, confusion: r.confusion ?? null, inference_mode: r.affectAvailable ? "four_cue" : "geometric", attention_index: r.attentionIndex, quality_flag: r.qualityFlag, timestamp: new Date(r.timestamp).toISOString() }));
     this.ws.send(JSON.stringify(batch));
     this.buffer.splice(0, batch.length);
   }

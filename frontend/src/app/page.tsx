@@ -55,6 +55,7 @@ export default function Home() {
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Attention Monitor</h1>
           <p className="text-gray-500">Real-time student engagement tracking for online lectures</p>
+          <a href="/dataset-review" className="mt-4 inline-flex min-h-10 items-center rounded-lg px-3 py-2 text-sm font-medium text-blue-700 underline">View trained DAiSEE model and measured results</a>
         </div>
 
         {mode === "choose" && (

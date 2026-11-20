@@ -1,0 +1,28 @@
+# Persistent single-worker API; deploy the frontend separately with Vercel.
+services:
+  - type: web
+    name: attention-monitoring-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: starter
+    healthCheckPath: /api/ready
+    disk:
+      name: attention-data
+      mountPath: /var/data
+      sizeGB: 10
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: DATABASE_URL
+        value: sqlite+aiosqlite:////var/data/attention_monitor.db
+      - key: AUTH_SECRET
+        generateValue: true
+      - key: CORS_ORIGINS
+        sync: false
+      - key: LIVEKIT_URL
+        sync: false
+      - key: LIVEKIT_API_KEY
+        sync: false
+      - key: LIVEKIT_API_SECRET
+        sync: false

@@ -73,3 +73,78 @@ Thumbs.db
 !/README.md
 .*/
 !.github/
+
+# Offline training data and intermediate checkpoints
+/training/artifacts/
+/training/prepared/
+/training/runs/
+*.h5
+*.hdf5
+*.keras
+*.npz
+
+/project_documents/
+/presentation_screenshots/
+/presentation_screenshots.zip
+
+/presentation_screenshots_mobile/
+/presentation_screenshots_mobile.zip
+/presentation_screenshots_daisee/
+/daisee_sample/
+/presentation_screenshots_daisee_sample/
+/daisee_sample*.zip
+/PROJECT NEW DOCUMENT/
+
+/FULL DAISEE TRAINING/
+
+/frontend/test-results/
+/frontend/playwright-report/
+
+/presentation_screenshots 2/
+
+/DAiSEE.zip
+/DAiSEE/
+
+# Research deliverables, exported datasets and distribution bundles
+*.DOC
+*.DOCX
+*.PDF
+*.odt
+*.rtf
+*.ppt
+*.pptx
+*.xls
+*.xlsx
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.gz
+*.7z
+*.rar
+*.csv
+*.avi
+*.mp4
+*.mov
+*.mkv
+*.webm
+
+# Generated notebook packages and local presentation-only tooling
+/training/*.ipynb
+/frontend/e2e/documents.spec.ts
+/screenshots/
+/artifacts/
+/reports/
+/exports/
+/checkpoints/
+.ipynb_checkpoints/
+
+# Keep deployable browser weights, topology, metadata and upstream licences.
+# frontend/public/models is runtime application data, not a training cache.
+
+# Unused framework starter artwork (not referenced by the application)
+/frontend/public/file.svg
+/frontend/public/globe.svg
+/frontend/public/next.svg
+/frontend/public/vercel.svg
+/frontend/public/window.svg

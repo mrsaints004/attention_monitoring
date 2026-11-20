@@ -25,7 +25,7 @@ async def dashboard_snapshot(db, session_id):
         if score is not None:
             scores.append(score)
         updates.append(dict(student_id=student.student_id, display_name=student.display_name,
-                            attention_index=score, quality_flag=flag, inference_mode=reading.inference_mode if reading else "geometric",
+                            attention_index=score, quality_flag=flag, boredom=reading.boredom if score is not None else None, confusion=reading.confusion if score is not None else None, inference_mode=reading.inference_mode if reading else "geometric",
                             **{cue: getattr(reading, cue) if fresh else 0 for cue in ("s_eye", "s_gaze", "s_yawn", "s_affect")}))
     alerts = (await db.execute(select(Alert).join(Student, Alert.student_id == Student.student_id)
                               .where(Student.session_id == session_id).order_by(Alert.triggered_at.desc()).limit(100))).scalars().all()

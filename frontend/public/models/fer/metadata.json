@@ -1,0 +1,365 @@
+{
+  "schema_version": 1,
+  "task": "daisee-affect",
+  "input": {
+    "shape": [
+      224,
+      224,
+      3
+    ],
+    "color_order": "RGB",
+    "normalization": "rgb_mean",
+    "mean": [
+      103.939,
+      116.779,
+      123.68
+    ]
+  },
+  "labels": [
+    "very_low",
+    "low",
+    "high",
+    "very_high"
+  ],
+  "outputs": {
+    "engagement": 0,
+    "boredom": 1,
+    "confusion": 2
+  },
+  "crop_margin": 0.1,
+  "sampling_fps": 2,
+  "source": {
+    "project": "EmotiEffLib",
+    "model": "mobilenet_7.h5",
+    "feature_layer": "feats",
+    "url": "https://raw.githubusercontent.com/sb-ai-lab/EmotiEffLib/main/models/affectnet_emotions/mobilenet_7.h5",
+    "reference": "https://github.com/sb-ai-lab/EmotiEffLib",
+    "preprocessing_reference": "https://github.com/sb-ai-lab/EmotiEffLib/blob/main/training_and_examples/affectnet/train_emotions.ipynb"
+  },
+  "training": {
+    "status": "fine_tuned",
+    "dataset": "DAiSEE",
+    "source_sha256": "63c8cd21321d28f7b6a9a8db29e74548cd7b5999a58d4dfb98a28f21027075dc",
+    "model_sha256": "b0d57e2f6de233607666d9914f186d91e14b4a161ade6357f911af4a378e977f",
+    "manifest_sha256": "a45e14eccb6479280c9a155c8ce7e416519128f694caeb9572d288d2404664f6"
+  },
+  "validation": {
+    "coverage": 0.9790062981105668,
+    "heads": {
+      "engagement": {
+        "scorable_accuracy": 0.45746962115796996,
+        "scorable_macro_f1": 0.33609139384586856,
+        "all_clip_accuracy_failures_counted_incorrect": 0.44786564030790765,
+        "all_clip_macro_f1": 0.33269419985912935,
+        "confusion_matrix_scorable": [
+          [
+            3,
+            9,
+            6,
+            5
+          ],
+          [
+            8,
+            52,
+            65,
+            18
+          ],
+          [
+            16,
+            186,
+            382,
+            214
+          ],
+          [
+            3,
+            78,
+            151,
+            203
+          ]
+        ],
+        "per_class_scorable": {
+          "0": {
+            "precision": 0.1,
+            "recall": 0.13043478260869565,
+            "f1-score": 0.11320754716981132,
+            "support": 23.0
+          },
+          "1": {
+            "precision": 0.16,
+            "recall": 0.36363636363636365,
+            "f1-score": 0.2222222222222222,
+            "support": 143.0
+          },
+          "2": {
+            "precision": 0.6324503311258278,
+            "recall": 0.47869674185463656,
+            "f1-score": 0.5449358059914408,
+            "support": 798.0
+          },
+          "3": {
+            "precision": 0.46136363636363636,
+            "recall": 0.4666666666666667,
+            "f1-score": 0.464,
+            "support": 435.0
+          },
+          "accuracy": 0.45746962115796996,
+          "macro avg": {
+            "precision": 0.33845349187236606,
+            "recall": 0.3598586386915906,
+            "f1-score": 0.33609139384586856,
+            "support": 1399.0
+          },
+          "weighted avg": {
+            "precision": 0.5222076812413098,
+            "recall": 0.45746962115796996,
+            "f1-score": 0.47968572161819384,
+            "support": 1399.0
+          }
+        },
+        "confidence_intervals": {
+          "method": "participant-cluster percentile bootstrap",
+          "confidence": 0.95,
+          "participants": 19,
+          "repetitions": 1000,
+          "seed": 42,
+          "scorable_accuracy_interval": [
+            0.393073303868465,
+            0.5209365136721631
+          ],
+          "scorable_macro_f1_interval": [
+            0.28126127383261507,
+            0.3637345835821561
+          ]
+        },
+        "training_majority_baseline": {
+          "class": 2,
+          "all_clip_accuracy": 0.5689293212036389
+        },
+        "binary_engagement": {
+          "definition": "0/1 = not engaged; 2/3 = engaged; unavailable = abstention",
+          "scorable_accuracy": 0.7305218012866334,
+          "all_clip_accuracy_failures_counted_incorrect": 0.71518544436669,
+          "scorable_macro_f1": 0.5554114119581866,
+          "all_clip_macro_f1": 0.5499859810790326,
+          "confusion_matrix_scorable": [
+            [
+              72,
+              94
+            ],
+            [
+              283,
+              950
+            ]
+          ],
+          "unavailable_by_true_class": [
+            0,
+            30
+          ],
+          "per_class": [
+            {
+              "label": 0,
+              "precision_scorable": 0.2028169014084507,
+              "recall_scorable": 0.43373493975903615,
+              "f1_scorable": 0.2763915547024952,
+              "f1_all_clips": 0.2763915547024952,
+              "support_all_clips": 166
+            },
+            {
+              "label": 1,
+              "precision_scorable": 0.9099616858237548,
+              "recall_scorable": 0.7704785077047851,
+              "f1_scorable": 0.8344312692138779,
+              "f1_all_clips": 0.82358040745557,
+              "support_all_clips": 1263
+            }
+          ]
+        },
+        "binary_auc_scorable": 0.6772344853868026
+      },
+      "boredom": {
+        "scorable_accuracy": 0.4167262330235883,
+        "scorable_macro_f1": 0.3975985229657086,
+        "all_clip_accuracy_failures_counted_incorrect": 0.4079776067179846,
+        "all_clip_macro_f1": 0.3934401944188254,
+        "confusion_matrix_scorable": [
+          [
+            171,
+            93,
+            129,
+            38
+          ],
+          [
+            74,
+            135,
+            113,
+            43
+          ],
+          [
+            56,
+            107,
+            225,
+            83
+          ],
+          [
+            9,
+            20,
+            51,
+            52
+          ]
+        ],
+        "per_class_scorable": {
+          "0": {
+            "precision": 0.5516129032258065,
+            "recall": 0.39675174013921116,
+            "f1-score": 0.46153846153846156,
+            "support": 431.0
+          },
+          "1": {
+            "precision": 0.38028169014084506,
+            "recall": 0.3698630136986301,
+            "f1-score": 0.375,
+            "support": 365.0
+          },
+          "2": {
+            "precision": 0.4343629343629344,
+            "recall": 0.47770700636942676,
+            "f1-score": 0.455005055611729,
+            "support": 471.0
+          },
+          "3": {
+            "precision": 0.24074074074074073,
+            "recall": 0.3939393939393939,
+            "f1-score": 0.2988505747126437,
+            "support": 132.0
+          },
+          "accuracy": 0.4167262330235883,
+          "macro avg": {
+            "precision": 0.40174956711758164,
+            "recall": 0.4095652885366655,
+            "f1-score": 0.3975985229657086,
+            "support": 1399.0
+          },
+          "weighted avg": {
+            "precision": 0.43810628881661967,
+            "recall": 0.4167262330235883,
+            "f1-score": 0.4214108177114154,
+            "support": 1399.0
+          }
+        },
+        "confidence_intervals": {
+          "method": "participant-cluster percentile bootstrap",
+          "confidence": 0.95,
+          "participants": 19,
+          "repetitions": 1000,
+          "seed": 42,
+          "scorable_accuracy_interval": [
+            0.3608331334452706,
+            0.4639812951987385
+          ],
+          "scorable_macro_f1_interval": [
+            0.3235637288672684,
+            0.44330489874817947
+          ]
+        },
+        "training_majority_baseline": {
+          "class": 0,
+          "all_clip_accuracy": 0.31210636808957315
+        }
+      },
+      "confusion": {
+        "scorable_accuracy": 0.42172980700500357,
+        "scorable_macro_f1": 0.27411533986178094,
+        "all_clip_accuracy_failures_counted_incorrect": 0.41287613715885235,
+        "all_clip_macro_f1": 0.2712040376657686,
+        "confusion_matrix_scorable": [
+          [
+            457,
+            188,
+            202,
+            70
+          ],
+          [
+            118,
+            77,
+            71,
+            53
+          ],
+          [
+            49,
+            11,
+            54,
+            37
+          ],
+          [
+            3,
+            0,
+            7,
+            2
+          ]
+        ],
+        "per_class_scorable": {
+          "0": {
+            "precision": 0.7288676236044657,
+            "recall": 0.4983642311886587,
+            "f1-score": 0.5919689119170984,
+            "support": 917.0
+          },
+          "1": {
+            "precision": 0.27898550724637683,
+            "recall": 0.2413793103448276,
+            "f1-score": 0.25882352941176473,
+            "support": 319.0
+          },
+          "2": {
+            "precision": 0.16167664670658682,
+            "recall": 0.3576158940397351,
+            "f1-score": 0.22268041237113403,
+            "support": 151.0
+          },
+          "3": {
+            "precision": 0.012345679012345678,
+            "recall": 0.16666666666666666,
+            "f1-score": 0.022988505747126436,
+            "support": 12.0
+          },
+          "accuracy": 0.42172980700500357,
+          "macro avg": {
+            "precision": 0.2954688641424438,
+            "recall": 0.31600652555997205,
+            "f1-score": 0.27411533986178094,
+            "support": 1399.0
+          },
+          "weighted avg": {
+            "precision": 0.5589201640155339,
+            "recall": 0.42172980700500357,
+            "f1-score": 0.4712657630073902,
+            "support": 1399.0
+          }
+        },
+        "confidence_intervals": {
+          "method": "participant-cluster percentile bootstrap",
+          "confidence": 0.95,
+          "participants": 19,
+          "repetitions": 1000,
+          "seed": 42,
+          "scorable_accuracy_interval": [
+            0.3503498430415068,
+            0.5007132682574115
+          ],
+          "scorable_macro_f1_interval": [
+            0.23862817440834505,
+            0.2981394691058914
+          ]
+        },
+        "training_majority_baseline": {
+          "class": 0,
+          "all_clip_accuracy": 0.6592022393282015
+        }
+      }
+    }
+  },
+  "parity": {
+    "status": "passed",
+    "absolute_tolerance": 0.0001
+  }
+}

@@ -1,0 +1,13 @@
+-r requirements.txt
+tensorflowjs==4.17.0
+tensorflow-decision-forests==1.8.1
+tf-keras==2.15.1
+# Bound the converter's optional JAX toolchain to the TensorFlow 2.15 environment.
+flax==0.8.2
+optax==0.2.1
+chex==0.1.86
+orbax-checkpoint==0.5.6
+tensorstore==0.1.56
+
+# TensorFlow Hub 0.16 imports pkg_resources, removed in newer setuptools.
+setuptools==80.9.0

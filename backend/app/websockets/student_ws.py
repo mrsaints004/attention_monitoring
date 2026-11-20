@@ -63,7 +63,7 @@ async def student_websocket(websocket: WebSocket, session_id: str, student_id: s
                         continue
                     reading = AttentivenessReading(reading_id=str(uuid.uuid4()), student_id=student_id,
                         timestamp=timestamp, s_eye=data.s_eye, s_gaze=data.s_gaze,
-                        s_yawn=data.s_yawn, s_affect=data.s_affect,
+                        s_yawn=data.s_yawn, s_affect=data.s_affect, boredom=data.boredom, confusion=data.confusion,
                         attention_index=data.attention_index, quality_flag=data.quality_flag, inference_mode=data.inference_mode)
                     db.add(reading)
                     await db.flush()

@@ -105,6 +105,10 @@ function StudentDetailPageContent() {
                 <span className="text-2xl text-gray-400">/100</span>
               </div>
               <p className="mb-4 text-sm capitalize">{student.quality_flag.replaceAll("_", " ")}</p>
+              {student.inference_mode === "four_cue" && <dl className="mb-4 space-y-2 text-sm text-gray-700">
+                <div className="flex justify-between"><dt>Boredom estimate</dt><dd>{student.boredom == null ? "Unavailable" : `${Math.round(student.boredom * 100)} / 100`}</dd></div>
+                <div className="flex justify-between"><dt>Confusion estimate</dt><dd>{student.confusion == null ? "Unavailable" : `${Math.round(student.confusion * 100)} / 100`}</dd></div>
+              </dl>}
               <CueBreakdown
                 affectAvailable={student.inference_mode === "four_cue"}
                 sEye={student.s_eye}
