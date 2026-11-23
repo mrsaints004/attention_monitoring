@@ -11,11 +11,14 @@ export async function loadAffectModel(): Promise<boolean> {
   if (model) return true;
   if (!modelPromise) modelPromise = (async () => {
     let loaded: tf.LayersModel | null = null;
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 120000);
     try {
-      const response = await fetch("/models/fer/metadata.json");
+      const response = await fetch("/models/fer/metadata.json", { signal: controller.signal });
       if (!response.ok) return false;
       const metadata = parseAffectModelSpec(await response.json());
-      loaded = await tf.loadLayersModel("/models/fer/model.json");
+      await tf.ready();
+      loaded = await tf.loadLayersModel("/models/fer/model.json", { requestInit: { signal: controller.signal } });
       if (loaded.inputs.length !== 1 || loaded.outputs.length !== 3 ||
           JSON.stringify(loaded.inputs[0].shape.slice(1)) !== JSON.stringify(metadata.input.shape) ||
           loaded.outputNames.join(",") !== "engagement,boredom,confusion" ||
@@ -36,8 +39,14 @@ export async function loadAffectModel(): Promise<boolean> {
       loaded?.dispose();
       console.warn("Compatible fine-tuned affect model unavailable; using geometric cues");
       return false;
+    } finally {
+      clearTimeout(timeout);
     }
-  })();
+  })().then(available => {
+    // A later initialization may retry after a network failure.
+    if (!available) modelPromise = null;
+    return available;
+  });
   return modelPromise;
 }
 

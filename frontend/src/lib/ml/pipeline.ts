@@ -49,7 +49,12 @@ export class AttentionPipeline {
   async initialize(video: HTMLVideoElement) {
     this.video = video;
     await initFaceMesh();
-    this.affectAvailable = await loadAffectModel();
+    // Calibration only needs landmarks. Large affect weights must not block it.
+    void loadAffectModel().then(available => {
+      if (this.video === video) this.affectAvailable = available;
+    }).catch(() => {
+      if (this.video === video) this.affectAvailable = false;
+    });
   }
   private startLoop() {
     this.throttle.start(() => { void this.processFrame(); });
