@@ -35,8 +35,7 @@ export class AttentionPipeline {
   private busy = false;
   private heartbeat: ReturnType<typeof setInterval> | null = null;
   private lastFrameTime = 0;
-  private frameTimes: number[] = [];
-  private monitoringSince = 0;
+  private unreliableSince: number | null = null;
   private canvas: HTMLCanvasElement | null = null;
   private listeners: PipelineListener[] = [];
   private calibrationListeners: ((progress: number) => void)[] = [];
@@ -61,7 +60,7 @@ export class AttentionPipeline {
     if (!this.heartbeat) this.heartbeat = setInterval(() => {
       if (this.state === "paused") this.emitUnavailable("monitoring_paused");
       else if (this.state === "running" && document.hidden) this.emitUnavailable("tab_inactive");
-      else if (this.state === "running" && Date.now() - this.lastFrameTime > 2000) this.emitUnavailable("low_confidence");
+      else if (this.state === "running" && !this.busy && Date.now() - this.lastFrameTime > 2000) this.emitUnavailable("low_confidence");
     }, 1000);
   }
   startCalibration() { this.automaticCalibration = false; this.calibrator.start(); this.setState("calibrating"); this.startLoop(); }
@@ -70,17 +69,23 @@ export class AttentionPipeline {
     this.calibration = data; this.eye.setBaseline(data.baselineEAR); this.yawn.setBaseline(data.baselineMAR);
   }
   getCalibrationData() { return this.calibration; }
-  startMonitoring() { this.monitoringSince = Date.now(); this.frameTimes = []; if (!this.calibration) throw new Error("Calibration is required. Please rejoin the session."); this.lastFrameTime = Date.now(); this.setState("running"); this.startLoop(); }
+  startMonitoring() { this.unreliableSince = null; if (!this.calibration) throw new Error("Calibration is required. Please rejoin the session."); this.lastFrameTime = Date.now(); this.setState("running"); this.startLoop(); }
   pause() { this.setState("paused"); this.emitUnavailable("monitoring_paused"); }
-  resume() { this.affectWindow = []; this.missingSince = 0; this.monitoringSince = Date.now(); this.frameTimes = []; this.fusion.reset(); this.eye = new EyeStateTracker(); this.yawn = new YawnTracker(); if (this.calibration) this.setCalibrationData(this.calibration); this.setState("running"); }
+  resume() { this.affectWindow = []; this.missingSince = 0; this.unreliableSince = null; this.fusion.reset(); this.eye = new EyeStateTracker(); this.yawn = new YawnTracker(); if (this.calibration) this.setCalibrationData(this.calibration); this.setState("running"); }
   stop() { this.affectWindow = []; this.throttle.stop(); if (this.heartbeat) clearInterval(this.heartbeat); this.heartbeat = null; this.fusion.reset(); this.setState("idle"); }
+  private reportUnreliable() {
+    const now = Date.now();
+    this.unreliableSince ??= now;
+    // A single dark/ambiguous frame must not clear the rolling measurements.
+    // No new scores are emitted during this grace period.
+    if (now - this.unreliableSince >= 1000) this.emitUnavailable("low_confidence");
+  }
   private emitUnavailable(flag: QualityFlag) { this.affectWindow = []; this.eye = new EyeStateTracker(); this.yawn = new YawnTracker(); this.fusion.reset(); if (this.calibration) this.setCalibrationData(this.calibration); this.listeners.forEach(cb => cb({ sEye: 0, sGaze: 0, sYawn: 0, sAffect: 0, attentionIndex: null, qualityFlag: flag, timestamp: Date.now(), affectAvailable: this.affectAvailable })); }
   private async processFrame() {
     if (this.busy || !this.video || this.state === "idle" || this.state === "paused") return;
     this.busy = true;
     try {
       const now = Date.now(); this.lastFrameTime = now;
-      this.frameTimes.push(now); this.frameTimes = this.frameTimes.filter(t => now - t <= 2000);
       if (this.video.readyState < 2 || !this.video.srcObject || !(this.video.srcObject as MediaStream).getVideoTracks().some(t => t.readyState === "live" && t.enabled)) { this.emitUnavailable("monitoring_paused"); return; }
       if (document.hidden) { this.emitUnavailable("tab_inactive"); return; }
       const result = detectFrame(this.video, performance.now());
@@ -97,7 +102,7 @@ export class AttentionPipeline {
         this.eye = new EyeStateTracker(); this.yawn = new YawnTracker(); this.fusion.reset();
         this.calibrator.start(); this.setState("calibrating");
       }
-      if ((result?.faceLandmarks.length ?? 0) > 1) { this.emitUnavailable("low_confidence"); return; }
+      if ((result?.faceLandmarks.length ?? 0) > 1) { this.reportUnreliable(); return; }
       this.canvas ??= document.createElement("canvas");
       this.canvas.width = this.canvas.height = 16;
       const ctx = this.canvas.getContext("2d", { willReadFrequently: true });
@@ -105,12 +110,12 @@ export class AttentionPipeline {
         const xs = landmarks.map(p => p.x), ys = landmarks.map(p => p.y);
         const x = Math.max(0, Math.min(...xs)), y = Math.max(0, Math.min(...ys));
         const w = Math.min(1, Math.max(...xs)) - x, h = Math.min(1, Math.max(...ys)) - y;
-        if (w <= 0 || h <= 0) { this.emitUnavailable("low_confidence"); return; }
+        if (w <= 0 || h <= 0) { this.reportUnreliable(); return; }
         ctx.drawImage(this.video, x * this.video.videoWidth, y * this.video.videoHeight, w * this.video.videoWidth, h * this.video.videoHeight, 0, 0, 16, 16);
         const pixels = ctx.getImageData(0, 0, 16, 16).data;
         let brightness = 0;
         for (let i = 0; i < pixels.length; i += 4) brightness += (pixels[i] + pixels[i+1] + pixels[i+2]) / 3;
-        if (brightness / 256 < 35) { this.emitUnavailable("low_confidence"); return; }
+        if (brightness / 256 < 35) { this.reportUnreliable(); return; }
       }
       if (this.state === "calibrating") {
         const { progress, timedOut } = this.calibrator.addFrame(landmarks, this.video.videoWidth / this.video.videoHeight);
@@ -123,7 +128,9 @@ export class AttentionPipeline {
         } else if (timedOut) this.calibrator.reset();
         return;
       }
-      if (now - this.monitoringSince > 2000 && this.frameTimes.length < 10) { this.emitUnavailable("low_confidence"); return; }
+      // Slow inference is not evidence of an unreliable face. Only image/tracking
+      // checks gate readings; otherwise slower devices oscillate forever.
+      this.unreliableSince = null;
       const { sEye, eyesClosedDuration } = this.eye.process(getAverageEAR(landmarks), now);
       const { sGaze } = computeGazeScore(landmarks, this.calibration?.baselineYaw ?? 0, this.calibration?.baselinePitch ?? 0, this.video.videoWidth / this.video.videoHeight);
       const sYawn = this.yawn.process(computeMAR(landmarks), now);
@@ -135,13 +142,15 @@ export class AttentionPipeline {
           this.lastAffect = this.affectWindow.reduce((sum, sample) => sum + sample.engagement, 0) / this.affectWindow.length;
         }
         catch { this.affectAvailable = false; }
-        this.lastAffectTime = now;
+        this.lastAffectTime = Date.now();
       }
+      // Inference can finish after pause/stop; never publish that stale result.
+      if (this.getState() !== "running" || document.hidden) return;
       const boredom = this.affectAvailable && this.affectWindow.length ? this.affectWindow.reduce((sum, sample) => sum + sample.boredom, 0) / this.affectWindow.length : null;
       const confusion = this.affectAvailable && this.affectWindow.length ? this.affectWindow.reduce((sum, sample) => sum + sample.confusion, 0) / this.affectWindow.length : null;
       const { attentionIndex } = this.fusion.compute({ sEye, sGaze, sYawn, sAffect: this.lastAffect }, eyesClosedDuration, this.affectAvailable);
       this.listeners.forEach(cb => cb({ sEye, sGaze, sYawn, sAffect: this.lastAffect, boredom, confusion, attentionIndex, qualityFlag: "normal", timestamp: now, affectAvailable: this.affectAvailable }));
-    } catch { this.emitUnavailable("low_confidence"); }
+    } catch { this.reportUnreliable(); }
     finally { this.busy = false; }
   }
 }
